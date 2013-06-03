@@ -4,29 +4,29 @@ import java.io.IOException;
 
 public class GameController {
 
-	enum Piece {
-		ROOK, KNIGHT, BISHOP, QUEEN, KING, PAWN
-	}
+    enum Piece {
+        ROOK, KNIGHT, BISHOP, QUEEN, KING, PAWN
+    }
 
-	enum Color {
-		BLACK, WHITE;
+    enum Color {
+        BLACK, WHITE;
 
-		public static Color other(Color c) {
-			return c == BLACK ? WHITE : BLACK;
-		}
-	}
+        public static Color other(Color c) {
+            return c == BLACK ? WHITE : BLACK;
+        }
+    }
 
     private Connection connection;
-	private ChessFrame frame;
-	private Board board;
-	private Color nextColor;
+    private ChessFrame frame;
+    private Board board;
+    private Color nextColor;
 
-	public GameController() {
+    public GameController() {
         connection = new Connection();
-		board = new Board();
-	}
-	
-	public void start() {
+        board = new Board();
+    }
+
+    public void start() {
         String host = frame.askInput("Please enter the address of the server.", "localhost");
         String portStr = frame.askInput("Please enter the port of the server.", "12345");
         int port;
@@ -42,15 +42,15 @@ public class GameController {
             frame.tell("Could not connect to server.", true);
             start();
         }
-	}
+    }
 
     public void messageReceived(String msg) {
-		String[] words = msg.split(" ");
+        String[] words = msg.split(" ");
 
         if (words[0].equals("say1")) {
             frame.appendChat("Player1:" + msg.substring(4));
         } else if (words[0].equals("say2")) {
-        	frame.appendChat("Player2:" + msg.substring(4));
+            frame.appendChat("Player2:" + msg.substring(4));
         } else if (words[0].equals("color")) {
             frame.tell(words[1].equals("black") ?
                 "You are playing with color black." :
@@ -100,34 +100,34 @@ public class GameController {
             }
         }
 
-	}
-	
-	public void sendMove(String from, String to) {
-		sendMessage("move " + from + " " + to);
-	}
-	
-	public void sendResign() {
-		sendMessage("resign");
-	}
-	
-	public void sendChat(String text) {
-		sendMessage("say " + text);		
-	}
+    }
 
-	public Board getBoard() {
-		return board;
-	}
+    public void sendMove(String from, String to) {
+        sendMessage("move " + from + " " + to);
+    }
 
-	public void setGui(ChessFrame chessFrame) {
-		frame = chessFrame;
-	}
-	
-	private void newGame() {
+    public void sendResign() {
+        sendMessage("resign");
+    }
+
+    public void sendChat(String text) {
+        sendMessage("say " + text);
+    }
+
+    public Board getBoard() {
+        return board;
+    }
+
+    public void setGui(ChessFrame chessFrame) {
+        frame = chessFrame;
+    }
+
+    private void newGame() {
         frame.clearLog();
-		frame.askReady();
+        frame.askReady();
         sendMessage("ready");
         frame.showWaiting();
-	}
+    }
 
     private void startGame() {
         nextColor = Color.WHITE;
@@ -136,25 +136,25 @@ public class GameController {
         frame.hideWaiting();
         frame.update();
     }
-	
-	private boolean hasGameEnded(String[] words, int idx) {
-		if (words.length <= idx) {
-			return false;
-		}
-		
-		String w = words[idx];
-		if (w.equals("check")) {
-			frame.tell("Check");
-		} else if (w.equals("checkmate")) {
-			frame.tell("Checkmate");
-			return true;
-		} else if (w.equals("stalemate")) {
-			frame.tell("Stalemate");
-			return true;
-		}
-		
-		return false;
-	}
+
+    private boolean hasGameEnded(String[] words, int idx) {
+        if (words.length <= idx) {
+            return false;
+        }
+
+        String w = words[idx];
+        if (w.equals("check")) {
+            frame.tell("Check");
+        } else if (w.equals("checkmate")) {
+            frame.tell("Checkmate");
+            return true;
+        } else if (w.equals("stalemate")) {
+            frame.tell("Stalemate");
+            return true;
+        }
+
+        return false;
+    }
 
     private void sendMessage(String msg) {
         connection.send(msg);
@@ -179,7 +179,5 @@ public class GameController {
         };
         new Thread(forwarder).start();
     }
-
-	
 
 }
